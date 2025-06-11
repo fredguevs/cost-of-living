@@ -3,9 +3,24 @@ import Select from "react-select";
 import AsyncSelect from "react-select/async";
 import makeAnimated from "react-select/animated";
 
+
 export default function Search() {
     const [selectedCity, setSelectedCity] = useState(null);
     const [cities, setCities] = useState([]);
+    const [cityDetails, setCityDetails] = useState(null);
+    
+    async function handleCitySelect(selectedOption) {
+      setSelectedCity(selectedOption);
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/city/${selectedOption.value}`
+        );
+        const data = await response.json();
+        setCityDetails(data);
+      } catch (error) {
+        console.error("Error fetching city details:", error);
+      }
+    }
 
     useEffect(() => {
         async function fetchCities() {
@@ -23,10 +38,21 @@ export default function Search() {
     , []);
 
     return (
+        <div>
             <Select
                 value={selectedCity}
-                onChange={setSelectedCity}
+                onChange={handleCitySelect}
                 options={cities}
+                isSearchable
+                placeholder="Search for a city"
             />
-        );
+
+            {cityDetails && (
+                <div className="city-details" style={{ marginTop: "1rem" }}>
+                    <h2>{selectedCity.label}</h2>
+                    <pre>{JSON.stringify(cityDetails, null, 2)}</pre>
+                </div>
+            )}
+        </div>
+    );
     }
