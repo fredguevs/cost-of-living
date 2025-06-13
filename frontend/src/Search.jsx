@@ -3,6 +3,19 @@ import Select from "react-select";
 import AsyncSelect from "react-select/async";
 import makeAnimated from "react-select/animated";
 
+const displayOrder = [
+  "Restaurants",
+  "Markets",
+  "Transportation",
+  "Utilities (Monthly)",
+  "Rent Per Month",
+  "Buy Apartment Price",
+  "Salaries And Financing",
+  "Childcare",
+  "Clothing And Shoes",
+  "Sports And Leisure",
+];
+
 
 export default function Search() {
     const [selectedCity, setSelectedCity] = useState(null);
@@ -40,19 +53,31 @@ export default function Search() {
     return (
         <div>
             <Select
-                value={selectedCity}
-                onChange={handleCitySelect}
-                options={cities}
-                isSearchable
-                placeholder="Search for a city"
+            value={selectedCity}
+            onChange={handleCitySelect}
+            options={cities}
+            isSearchable
+            placeholder="Search for a city"
             />
-
             {cityDetails && (
-                <div className="city-details" style={{ marginTop: "1rem" }}>
-                    <h2>{selectedCity.label}</h2>
-                    <pre>{JSON.stringify(cityDetails, null, 2)}</pre>
+            <div className="city-details">
+                <h2>Cost of living in {selectedCity.label}</h2>
+                <div>
+                {displayOrder.map((category) =>
+                    cityDetails[category] ? (
+                    <div key={category}>
+                        <h3>{category}</h3>
+                        {cityDetails[category].map((item, index) => (
+                        <p key={index}>
+                            {item.name}: {item.price}
+                        </p>
+                        ))}
+                    </div>
+                    ) : null
+                )}
                 </div>
+            </div>
             )}
         </div>
     );
-    }
+}

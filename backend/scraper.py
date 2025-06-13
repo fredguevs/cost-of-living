@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 import pprint
+from collections import OrderedDict
+
 
 def get_city_data(city_name):
     """
@@ -18,16 +20,24 @@ def get_city_data(city_name):
     doc = BeautifulSoup(result, "html.parser")
 
     table = doc.find("table", class_="data_wide_table new_bar_table")
-
-    city_details = {}
+    city_details = OrderedDict()
+    category = ""
+    
 
     for tr in table.find_all("tr"):
-        tds = tr.find_all("td")
-        if len(tds) >= 2:
-            item = tds[0].text.strip()
-            price = tds[1].text.replace("\xa0", "").strip()
-            city_details[item] = price
-
+        if tr.find("th"):
+            category = tr.find("th").text.strip()
+            city_details[category] = []
+        else:
+            tds = tr.find_all("td")
+            if len(tds) >= 2:
+                item = tds[0].text.strip()
+                price = tds[1].text.replace("\xa0", "").strip()
+                city_details[category].append({
+                    "name": item,
+                    "price": price
+                })
+        
     return city_details
 
 
@@ -61,3 +71,4 @@ def get_city_names():
         links[link.string] = slug
 
     return links
+
