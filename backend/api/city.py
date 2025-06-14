@@ -6,10 +6,9 @@ from db.model import execute_query
 
 @app.route("/api/cities", methods=["GET"])
 def get_cities():
-    city_names = get_city_names()
-    city_array = [{"label": name, "value": slug}
-                  for name, slug in city_names.items()]
-    city_array.sort(key=lambda x: x["label"].lower())
+    data = execute_query(
+        "SELECT name, slug FROM cities ORDER BY name ASC", fetchall=True)
+    city_array = [{"label": row["name"], "value": row["slug"]} for row in data]
     return jsonify(city_array)
 
 
@@ -27,10 +26,13 @@ def get_city(slug):
         # Group data into category -> list of items
         grouped = {}
         for row in data:
-            grouped.setdefault(row["category"], []).append({
+            if row["category"] not in grouped:
+                grouped[row["category"]] = []
+            grouped[row["category"]].append({
                 "name": row["item_name"],
                 "price": row["price"]
             })
+
         return jsonify(grouped)
 
     # Fallback: scrape
@@ -60,9 +62,3 @@ def get_city(slug):
             """, (city_id, category, item["name"], item["price"]))
 
     return jsonify(scraped)
-
-
-@app.route("/api/db-test")
-def test_db():
-    result = execute_query("SELECT 1", fetchone=True)
-    return jsonify(result)
