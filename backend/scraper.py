@@ -5,15 +5,8 @@ from collections import OrderedDict
 
 
 def get_city_data(city_name):
-    """
-    Fetches the cost of living data for a given city from Numbeo.
+    """Fetches the cost of living data for a given city from Numbeo."""
     
-    Args:
-        city_name (str): The name of the city to fetch data for.
-        
-    Returns:
-        dict: A dictionary containing the cost of living data for the city.
-    """
     url = f"https://www.numbeo.com/cost-of-living/in/{city_name}"
 
     result = requests.get(url).text
@@ -42,14 +35,7 @@ def get_city_data(city_name):
 
 
 def get_city_names():
-    """
-    Fetches the list of city names from Numbeo.
-    
-    Returns:
-        list: A list of city names.
-    """
-    from bs4 import BeautifulSoup
-
+    """Fetches the list of city names from Numbeo."""
 
     url = "https://www.numbeo.com/cost-of-living/country_result.jsp?country=United+States"
     result = requests.get(url).text
@@ -71,4 +57,27 @@ def get_city_names():
         links[link.string] = slug
 
     return links
+
+def get_items():
+    """Fetches the list of items from Numbeo."""
+    
+    url = f"https://www.numbeo.com/cost-of-living/in/New-York"
+
+
+    result = requests.get(url).text
+    doc = BeautifulSoup(result, "html.parser")
+
+    table = doc.find("table", class_="data_wide_table new_bar_table")
+
+    items = []
+
+    for tr in table.find_all("tr"):
+        # Find the item name
+        tds = tr.find_all("td")
+        if len(tds) >= 2:
+            # The first td contains the item name
+            item_name = tds[0].text.strip()
+            items.append(item_name)
+
+    return items
 

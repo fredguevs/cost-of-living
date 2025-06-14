@@ -19,6 +19,7 @@ def get_city(slug):
         SELECT category, item_name, price 
         FROM numbeo_data
         JOIN cities ON cities.id = numbeo_data.city_id
+        JOIN items ON items.id = numbeo_data.item_id
         WHERE cities.slug = %s
     """, (slug,), fetchall=True)
 
@@ -62,3 +63,4 @@ def get_city(slug):
             """, (city_id, category, item["name"], item["price"]))
 
     return jsonify(scraped)
+s

@@ -1,0 +1,2 @@
+
+BLS_API_KEY = "e80f94ddda79470cad098217da8689d7"
