@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS numbeo_data (
 """)
 
 cur.execute("""
-CREATE TABLE items(
+CREATE TABLE IF NOT EXISTS items(
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     bls_series_id TEXT UNIQUE,
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS bls_data (
     item_id INTEGER REFERENCES items(id),
     year INTEGER NOT NULL,
     month INTEGER NOT NULL,
-    price NUMERIC NOT NULL,
-    collected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    price NUMERIC,
+    UNIQUE(item_id, year, month)
 );
 """)
 

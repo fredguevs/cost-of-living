@@ -63,4 +63,3 @@ def get_city(slug):
             """, (city_id, category, item["name"], item["price"]))
 
     return jsonify(scraped)
-s

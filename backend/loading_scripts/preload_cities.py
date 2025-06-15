@@ -27,5 +27,5 @@ def preload_city_names_only():
 
 
 if __name__ == "__main__":
-    with app.app_context():  # <- fixes the RuntimeError
+    with app.app_context():
         preload_city_names_only()

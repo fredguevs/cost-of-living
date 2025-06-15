@@ -5,6 +5,7 @@ from api import app  # import your Flask app
 
 def preload_item_names():
     """Preload item names into the database from Numbeo"""
+    print("Starting preload...")
     items = get_items()
     db = get_db()
     cur = get_cursor()
@@ -19,3 +20,8 @@ def preload_item_names():
 
     db.commit()
     print("Item names preloaded.")
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        preload_item_names()
