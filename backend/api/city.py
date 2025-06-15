@@ -16,7 +16,7 @@ def get_cities():
 def get_city(slug):
     # Try to fetch city data from DB
     data = execute_query("""
-        SELECT category, item_name, price 
+        SELECT numbeo_data.category, items.name AS item_name, numbeo_data.price
         FROM numbeo_data
         JOIN cities ON cities.id = numbeo_data.city_id
         JOIN items ON items.id = numbeo_data.item_id
@@ -57,9 +57,16 @@ def get_city(slug):
     # Insert scraped data into numbeo_data
     for category, items in scraped.items():
         for item in items:
+            item_row = execute_query("""
+                SELECT id FROM items WHERE name = %s
+            """, (item["name"],), fetchone=True)
+
+
+            item_id = item_row["id"] if item_row else None
+
             execute_query("""
-                INSERT INTO numbeo_data (city_id, category, item_name, price)
+                INSERT INTO numbeo_data (city_id, category, item_id, price)
                 VALUES (%s, %s, %s, %s)
-            """, (city_id, category, item["name"], item["price"]))
+            """, (city_id, category, item_id, item["price"]))
 
     return jsonify(scraped)
