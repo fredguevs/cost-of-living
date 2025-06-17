@@ -14,8 +14,12 @@ cur = conn.cursor()
 cur.execute("""
 CREATE TABLE IF NOT EXISTS cities (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL
+    name TEXT NOT NULL, 
+    slug TEXT UNIQUE NOT NULL, 
+    zip_centre TEXT, 
+    zip_suburb TEXT, 
+    state TEXT, 
+    UNIQUE(name, slug) 
 );
 """)
 

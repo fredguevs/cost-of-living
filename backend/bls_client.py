@@ -49,9 +49,11 @@ def fetch_and_store_bls_data(start_year="2020", end_year="2025"):
                 price = float(entry["value"])
 
                 cur.execute("""
-                    INSERT INTO bls_data (item_id, year, month, price)
-                    VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (item_id, year, month) DO NOTHING
+                    INSERT INTO bls_data (item_id, year, month, price) 
+                    VALUES (%s, %s, %s, %s) 
+                    ON CONFLICT (item_id, year, month)
+                    DO UPDATE 
+                    SET price = EXCLUDED.price
                 """, (item_id, year, month, price))
         else:
             print(

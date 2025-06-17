@@ -3,7 +3,7 @@ from db.model import execute_query, get_cursor, get_db
 from api import app  # import your Flask app
 
 
-def preload_city_names_only():
+def preload_city_names_only(): 
     city_names = get_city_names()
     db = get_db()
     cur = get_cursor()
@@ -17,6 +17,10 @@ def preload_city_names_only():
         if exists:
             print(f"Skipping {name}, already exists.")
             continue
+
+        #TODO: Add ZIP code lookup
+
+        #TODO : Add state extraction from name
 
         # Insert into cities table
         cur.execute(

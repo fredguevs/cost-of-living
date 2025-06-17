@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 const displayOrder = [
   "Restaurants",
   "Markets",
-  "Transportation",
+  "Transportation", 
   "Utilities (Monthly)",
   "Rent Per Month",
   "Buy Apartment Price",
