@@ -14,12 +14,11 @@ cur = conn.cursor()
 cur.execute("""
 CREATE TABLE IF NOT EXISTS cities (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL, 
+    name TEXT NOT NULL,
+    state TEXT NOT NULL,  
     slug TEXT UNIQUE NOT NULL, 
     zip_centre TEXT, 
-    zip_suburb TEXT, 
-    state TEXT, 
-    UNIQUE(name, slug) 
+    zip_suburb TEXT,
 );
 """)
 
@@ -51,6 +50,19 @@ CREATE TABLE IF NOT EXISTS bls_data (
     month INTEGER NOT NULL,
     price NUMERIC,
     UNIQUE(item_id, year, month)
+);
+""")
+
+cur.execute("""
+CREATE TABLE rentcast_prices (
+    id SERIAL PRIMARY KEY, 
+    city_id INTEGER NOT NULL REFERENCES cities(id), 
+    item_id INTEGER NOT NULL REFERENCES items(id), 
+    average_rent NUMERIC NOT NULL, 
+    month INTEGER NOT NULL, 
+    year INTEGER NOT NULL, 
+    collected_at TIMESTAMP DEFAULT NOW(), 
+    UNIQUE(city_id, item_id, year, month)
 );
 """)
 

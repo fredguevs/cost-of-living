@@ -57,6 +57,8 @@ bls_series_map = {
     # "1 Summer Dress in a Chain Store (Zara, H&M, ...)": None,
     # "1 Pair of Nike Running Shoes (Mid-Range)": None,
     # "1 Pair of Men Leather Business Shoes": None,
+
+   
     # "Apartment (1 bedroom) in City Centre": None,
     # "Apartment (1 bedroom) Outside of Centre": None,
     # "Apartment (3 bedrooms) in City Centre": None,
