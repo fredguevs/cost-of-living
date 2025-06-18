@@ -1,5 +1,4 @@
-// RentcastLineChart.js
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -18,25 +17,51 @@ import {
 export default function RentcastLineChart({ data }) {
   const [showPrev, setShowPrev] = useState(true);
   const [showCurr, setShowCurr] = useState(true);
+
   const now = new Date();
   const currentYear = now.getFullYear();
   const prevYear = currentYear - 1;
+  const currentMonth = now.getMonth() + 1; // 1–12
 
   // Split data by year
-  const prevData = data.filter(
-    (d) => parseInt(d.date.split("-")[0]) === prevYear
-  );
-  const currData = data.filter(
-    (d) =>
-      parseInt(d.date.split("-")[0]) === currentYear &&
-      parseInt(d.date.split("-")[1]) <= now.getMonth() + 1
+  const prevData = useMemo(
+    () =>
+      data
+        .filter((d) => +d.date.slice(0, 4) === prevYear)
+        .map((d) => ({
+          month: +d.date.slice(5, 7),
+          price: d.price,
+        })),
+    [data, prevYear]
   );
 
-  const monthFormatter = (dateString) => {
-    const [year, month] = dateString.split("-");
-    const d = new Date(year, month - 1);
-    return d.toLocaleString("en-US", { month: "short" });
-  };
+  const currData = useMemo(
+    () =>
+      data
+        .filter((d) => +d.date.slice(0, 4) === currentYear)
+        .map((d) => ({
+          month: +d.date.slice(5, 7),
+          price: d.price,
+        })),
+    [data, currentYear]
+  );
+
+  // Build a chartData array for months 1–12
+  const chartData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    return months.map((m) => {
+      const entry = { month: m };
+      const prev = prevData.find((d) => d.month === m);
+      const curr = currData.find((d) => d.month === m);
+      if (prev) entry[prevYear] = prev.price;
+      if (curr && m <= currentMonth) entry[`YTD ${currentYear}`] = curr.price;
+      return entry;
+    });
+  }, [prevData, currData, prevYear, currentYear, currentMonth]);
+
+  // Format month number to "Jan", "Feb", etc.
+  const monthFormatter = (m) =>
+    new Date(2000, m - 1).toLocaleString("en-US", { month: "short" });
 
   return (
     <div>
@@ -48,54 +73,63 @@ export default function RentcastLineChart({ data }) {
           style={{ marginLeft: 8 }}
           onClick={() => setShowCurr((s) => !s)}
         >
-          {showCurr ? "Hide" : "Show"} {currentYear}
+          {showCurr ? "Hide" : "Show"} YTD {currentYear}
         </button>
       </div>
+
       <ResponsiveContainer width="100%" height={250}>
         <LineChart
-          data={data}
+          data={chartData}
           margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+          <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+
           <XAxis
-            dataKey="date"
+            dataKey="month"
+            type="category"
+            ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
             tickFormatter={monthFormatter}
             interval={0}
+            axisLine={false}
             tickLine={false}
-            padding={{ left: 10, right: 10 }}
+            height={30}
           />
+
           <YAxis
             tickFormatter={(val) => `$${val}`}
-            tickLine={false}
             axisLine={false}
+            tickLine={false}
             width={60}
           />
+
           <Tooltip
-            labelFormatter={monthFormatter}
-            formatter={(value) => `$${value}`}
+            labelFormatter={(m) => monthFormatter(m)}
+            formatter={(value, name) => [`$${value}`, name]}
             cursor={{ stroke: "#aaa", strokeDasharray: "3 3" }}
           />
+
           <Legend verticalAlign="top" height={24} />
+
           {showPrev && (
             <Line
               type="monotone"
-              dataKey="price"
-              data={prevData}
+              dataKey={`${prevYear}`}
               name={`${prevYear}`}
               stroke="#82ca9d"
               strokeWidth={2}
               dot={false}
+              connectNulls
             />
           )}
           {showCurr && (
             <Line
               type="monotone"
-              dataKey="price"
-              data={currData}
+              dataKey={`YTD ${currentYear}`}
               name={`YTD ${currentYear}`}
               stroke="#ff7300"
               strokeWidth={2}
               dot={false}
+              connectNulls
             />
           )}
         </LineChart>
