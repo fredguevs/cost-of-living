@@ -8,6 +8,7 @@ CORS(app, supports_credentials=True)
 # Route handlers
 from api import city  
 from api import bls
+from api import rentcast
 
 
 @app.teardown_appcontext
